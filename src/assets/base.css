@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=Mulish&display=swap");
+
+:root {
+  --blue-50: #899de6;
+  --blue-100: #748ce2;
+  --blue-200: #5e7ade;
+  --blue-300: #4969d9;
+  --blue-400: #3457d5;
+  --blue-500: #294bc7;
+  --blue-600: #2543b1;
+  --blue-700: #203b9c;
+  --blue-800: #1c3387;
+  --blue-900: #182b72;
+  --bluedark-50: #646eaa;
+  --bluedark-100: #56619e;
+  --bluedark-200: #4d578e;
+  --bluedark-300: #444d7d;
+  --bluedark-400: #3b426d;
+  --bluedark-500: #32385c;
+  --bluedark-600: #2a2f4d;
+  --bluedark-700: #20243b;
+  --bluedark-800: #171a2b;
+  --bluedark-900: #0e101a;
+  --light-50: #f9fafb;
+  --light-100: #eff2f5;
+  --light-200: #e3e8ed;
+  --light-300: #d3dbe4;
+  --light-400: #c3cfda;
+  --light-500: #b3c2d0;
+  --light-600: #a3b5c7;
+  --light-700: #94a8bd;
+  --light-800: #849cb3;
+  --light-900: #748fa9;
+  --green-500: #25897d;
+  --yellow-500: #e5ba52;
+  --red-500: #e4443a;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  font-weight: normal;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--bluedark-600);
+  background: var(--light-100);
+  transition: color 0.5s, background-color 0.5s;
+  line-height: 1.6;
+  font-family: "Mulish", sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a,
+button {
+  cursor: revert;
+  font-family: "Mulish", sans-serif;
+}
+
+ol,
+ul,
+menu {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+textarea {
+  white-space: revert;
+}
+
+meter {
+  -webkit-appearance: revert;
+  appearance: revert;
+}
+
+::placeholder {
+  color: unset;
+}
+
+:where([hidden]) {
+  display: none;
+}
+
+:where([contenteditable]) {
+  -moz-user-modify: read-write;
+  -webkit-user-modify: read-write;
+  overflow-wrap: break-word;
+  -webkit-line-break: after-white-space;
+}
+
+:where([draggable="true"]) {
+  -webkit-user-drag: element;
+}
