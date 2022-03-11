@@ -32,7 +32,7 @@
   --light-800: #849cb3;
   --light-900: #748fa9;
   --green-500: #25897d;
-  --yellow-500: #e5ba52;
+  --yellow-500: #ffa31c;
   --red-500: #e4443a;
 }
 
@@ -61,7 +61,7 @@ body {
 
 a,
 button {
-  cursor: revert;
+  cursor: pointer;
   font-family: "Mulish", sans-serif;
 }
 

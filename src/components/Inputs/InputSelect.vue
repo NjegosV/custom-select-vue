@@ -1,186 +1,228 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from "vue";
+import { ref, computed, watchEffect } from "vue";
+
+// icons
 import IconChevron from "../../icons/IconChevron.vue";
 import IconUndo from "../../icons/IconUndo.vue";
 
-const label = ref("Select");
+// define props
+interface Select {
+  label: string;
+  options: string[];
+}
+const props = defineProps<Select>();
+
+// data
+const optionsMenuOpen = ref(false);
 const selectedOption = ref("");
-const isOpen = ref(false);
 const searchTerm = ref("");
-const options = ref(["Option 1", "Hello", "World"]);
-const searchInput = ref();
+const optionsMenu = ref();
 
-const filterOptionsInput = ref<null | { isOpen: () => null }>(null);
-
-const toggleOptions = async () => {
-  isOpen.value = !isOpen.value;
-
-  await nextTick();
-  if (isOpen.value) {
-    searchInput.value.focus();
-  } else {
-    searchInput.value.blur();
-  }
+// methods
+const toggleOptions = () => {
+  optionsMenuOpen.value = !optionsMenuOpen.value;
 };
 
-const pickOption = (option: string) => {
+const closeOptions = () => {
+  optionsMenuOpen.value = false;
+};
+
+const chooseOption = (option: string) => {
   selectedOption.value = option;
-  isOpen.value = false;
+  optionsMenuOpen.value = false;
 };
 
-const resetOption = () => {
+const resetInput = () => {
   selectedOption.value = "";
 };
 
-const filteredList = computed(() =>
+// close on click outside of element
+const handleClickOutside = (e: Event) => {
+  if (optionsMenu.value && !optionsMenu.value.contains(e.target)) {
+    optionsMenuOpen.value = false;
+  }
+};
+watchEffect(() => {
+  console.log(optionsMenuOpen.value);
+  document.addEventListener("click", handleClickOutside, true);
+  return () => {
+    document.removeEventListener("click", handleClickOutside, true);
+  };
+});
+
+// computed
+const filteredOptions = computed(() =>
   searchTerm.value
-    ? options.value.filter((option) =>
+    ? props.options.filter((option) =>
         option.toLowerCase().includes(searchTerm.value.toLowerCase())
       )
-    : options.value
+    : props.options
 );
+
+// directives
+const vFocus = {
+  mounted: (el: HTMLElement) => el.focus(),
+};
 </script>
 
 <template>
-  <div class="select-wrapper">
-    <p v-if="selectedOption" class="label">
-      {{ label }}
-      <button @click="resetOption" class="btn-icon" aria-label="reset">
-        <IconUndo />
-      </button>
-    </p>
-    <button @click="toggleOptions" class="select-label">
-      {{ selectedOption || label }} <IconChevron :class="{ rotate: isOpen }" />
+  <div class="select" @keydown.escape="closeOptions" ref="optionsMenu">
+    <p v-if="selectedOption" class="label">{{ props.label }}</p>
+    <button @click="resetInput" v-if="selectedOption" class="reset-input">
+      <IconUndo />
     </button>
-    <div v-show="isOpen" class="options-container">
+    <button
+      @click="toggleOptions"
+      class="select-header"
+      :class="{ selected: selectedOption, disabled: !props.options.length }"
+      :disabled="!props.options.length"
+    >
+      {{ selectedOption || props.label }}
+      <IconChevron :class="{ rotate: optionsMenuOpen }" />
+    </button>
+    <div v-if="optionsMenuOpen" tabindex="-1" class="options-container">
       <input
         v-model="searchTerm"
         type="text"
-        name="search"
-        id="search"
         placeholder="Search"
-        ref="searchInput"
+        autocomplete="off"
+        v-focus="true"
       />
-      <ul>
-        <li v-for="option in filteredList" :key="option">
-          <button @click="pickOption(option)" ref="filterOptionsInput">
-            {{ option }}
-          </button>
+      <ul class="options-list">
+        <li v-for="option in filteredOptions" :key="option">
+          <button @click="chooseOption(option)">{{ option }}</button>
         </li>
       </ul>
     </div>
   </div>
 </template>
 
-<style scoped>
-.select-wrapper {
+<style>
+.select {
+  display: inline-block;
   position: relative;
-  width: min(16rem, 90%);
 }
 
 .label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background-color: var(--light-100);
+  font-size: 0.8rem;
   position: absolute;
-  top: -2rem;
-  width: 100%;
+  top: -0.7rem;
+  left: 0.2rem;
+  z-index: 20;
 }
 
-.label svg {
-  cursor: pointer;
+.reset-input {
+  background-color: transparent;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  bottom: 3rem;
+  right: -1rem;
+}
+
+.reset-input:hover {
+  background-color: var(--light-200);
+}
+
+.reset-input:focus-visible {
+  background-color: var(--light-200);
+  outline: none;
+}
+
+.reset-input svg {
+  fill: var(--yellow-500);
   height: 1.5rem;
   width: 1.5rem;
 }
 
-.label svg:hover {
-  background-color: var(--light-200);
-}
-
-.select-label {
-  background-color: var(--light-200);
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
+.select-header {
+  background-color: var(--light-50);
+  border: 1px solid var(--light-300);
+  height: 2.5rem;
+  padding-inline: 0.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
 }
 
-.select-label:hover {
-  background-color: var(--light-300);
-}
-
-.select-label:focus-visible {
-  background-color: var(--light-300);
-  outline: none;
-}
-
-.select-label svg {
+.select-header svg {
+  margin-left: 0.3rem;
   height: 1rem;
   width: 1rem;
 }
 
-.select-label svg.rotate {
-  transform: rotate(180deg);
+.select-header.selected {
+  background-color: var(--light-100);
+}
+
+.select-header.disabled {
+  background-color: var(--light-100);
+  color: var(--light-500);
+}
+
+.select-header.disabled svg {
+  fill: var(--light-500);
 }
 
 .options-container {
-  background-color: var(--light-50);
-  border: 1px solid var(--light-200);
+  max-height: 10rem;
+  overflow-y: auto;
   position: absolute;
-  top: 2.5rem;
-  left: 0;
-  width: 100%;
+  top: 3rem;
+  z-index: 10;
 }
 
 .options-container input {
-  border: 1px solid var(--light-200);
-  display: block;
+  background-color: var(--light-50);
+  border: 1px solid var(--light-300);
   padding: 0.5rem;
-  width: 100%;
+  position: sticky;
+  top: 0;
+  min-width: 100%;
+  max-width: 100%;
+  z-index: 12;
+}
+
+.options-container input:hover {
+  background-color: var(--light-200);
 }
 
 .options-container input:focus {
-  border: 1px solid var(--blue-50);
+  border: 1px solid var(--blue-400);
   outline: none;
 }
 
-.options-container li button {
+.options-list {
+  background-color: var(--light-50);
+  border: 1px solid var(--light-300);
+  border-top: none;
+}
+
+.options-list button {
   background-color: transparent;
   border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  display: block;
-  width: 100%;
   text-align: left;
+  padding: 0.5rem;
+  width: 100%;
 }
 
-.options-container li button:hover {
-  background-color: var(--light-200);
-}
-.options-container li button:focus-visible {
-  background-color: var(--light-200);
-  outline: none;
+.options-list li:not(:last-child) {
+  border-bottom: 1px solid var(--light-300);
 }
 
-.btn-icon {
-  background-color: transparent;
-  border: none;
-  border-radius: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2px;
-}
-
-.btn-icon:hover {
+.options-list button:hover {
   background-color: var(--light-200);
 }
 
-.btn-icon:focus-visible {
+.options-list button:focus-visible {
   background-color: var(--light-200);
   outline: none;
+}
+
+.rotate {
+  transform: rotate(180deg);
 }
 </style>
