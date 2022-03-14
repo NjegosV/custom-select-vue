@@ -17,6 +17,8 @@ const optionsMenuOpen = ref(false);
 const selectedOption = ref("");
 const searchTerm = ref("");
 const optionsMenu = ref();
+const searchInputRef = ref();
+const optionsList = ref();
 
 // methods
 const toggleOptions = () => {
@@ -36,6 +38,11 @@ const resetInput = () => {
   selectedOption.value = "";
 };
 
+const focusToTop = () => {
+  optionsList.value.scrollTop = 0;
+  searchInputRef.value.focus();
+};
+
 // close on click outside of element
 const handleClickOutside = (e: Event) => {
   if (optionsMenu.value && !optionsMenu.value.contains(e.target)) {
@@ -43,7 +50,6 @@ const handleClickOutside = (e: Event) => {
   }
 };
 watchEffect(() => {
-  console.log(optionsMenuOpen.value);
   document.addEventListener("click", handleClickOutside, true);
   return () => {
     document.removeEventListener("click", handleClickOutside, true);
@@ -80,16 +86,23 @@ const vFocus = {
       {{ selectedOption || props.label }}
       <IconChevron :class="{ rotate: optionsMenuOpen }" />
     </button>
-    <div v-if="optionsMenuOpen" tabindex="-1" class="options-container">
+    <div v-if="optionsMenuOpen" class="options-container" ref="optionsList">
       <input
         v-model="searchTerm"
         type="text"
         placeholder="Search"
         autocomplete="off"
         v-focus="true"
+        ref="searchInputRef"
       />
       <ul class="options-list">
-        <li v-for="option in filteredOptions" :key="option">
+        <li
+          v-for="(option, index) in filteredOptions"
+          :key="option"
+          v-on="{
+            focusout: index === filteredOptions.length - 1 ? focusToTop : null,
+          }"
+        >
           <button @click="chooseOption(option)">{{ option }}</button>
         </li>
       </ul>

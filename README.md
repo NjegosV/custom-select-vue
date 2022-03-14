@@ -8,5 +8,5 @@
 - [x] Focus on search when options open
 - [x] Scroll when many items
 - [x] Disabled if no options
-- [ ] Focus trap
+- [x] Focus trap
 - [ ] Navigate with arrow keys instead of tabs
