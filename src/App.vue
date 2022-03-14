@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import InputSelectOld from "./components/Inputs/InputSelectOld.vue";
 import InputSelect from "./components/Inputs/InputSelect.vue";
 
 const filterData = ref([

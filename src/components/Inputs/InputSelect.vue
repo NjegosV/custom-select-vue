@@ -78,6 +78,8 @@ const vFocus = {
       <IconUndo />
     </button>
     <button
+      :aria-expanded="optionsMenuOpen"
+      aria-haspopup="listbox"
       @click="toggleOptions"
       class="select-header"
       :class="{ selected: selectedOption, disabled: !props.options.length }"
@@ -86,7 +88,12 @@ const vFocus = {
       {{ selectedOption || props.label }}
       <IconChevron :class="{ rotate: optionsMenuOpen }" />
     </button>
-    <div v-if="optionsMenuOpen" class="options-container" ref="optionsList">
+    <div
+      v-if="optionsMenuOpen"
+      class="options-container"
+      ref="optionsList"
+      role="listbox"
+    >
       <input
         v-model="searchTerm"
         type="text"
@@ -165,6 +172,11 @@ const vFocus = {
   margin-left: 0.3rem;
   height: 1rem;
   width: 1rem;
+}
+
+.select-header:focus-visible {
+  border: 1px solid var(--blue-400);
+  outline: none;
 }
 
 .select-header.selected {
